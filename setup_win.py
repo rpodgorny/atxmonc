@@ -1,7 +1,7 @@
 import sys
 from cx_Freeze import setup, Executable
 
-from atxmonc import __version__
+from atxmon.version import __version__
 
 
 base = 'Win32GUI'

@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-from atxmonc import __version__
+from atxmon.version import __version__
 
 setup(
 	name = 'atxmonc',
