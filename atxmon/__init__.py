@@ -3,8 +3,6 @@ import requests
 import subprocess
 import json
 import re
-import sys
-import socket
 import jinja2
 import threading
 import random
@@ -211,13 +209,13 @@ def expand_host(s):
 	return ret
 #enddef
 
-def run(url, probes_fn):
+def run(url, probes_fn, host):
 	url = '%s/save' % url  # TODO: not very nice
 
 	data = []
 	last_sent = 0
 
-	src = socket.gethostname()
+	src = host
 	probes = load_probes(probes_fn)
 
 	threads = {}

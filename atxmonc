@@ -98,7 +98,7 @@ def main():
 	logging.info('%s' % cfg)
 
 	try:
-		atxmon.run(cfg.url, probes_fn)
+		atxmon.run(cfg.url, probes_fn, cfg.host)
 	except KeyboardInterrupt:
 		logging.debug('keyboard interrupt!')
 	#endtry
