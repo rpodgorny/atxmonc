@@ -8,7 +8,7 @@ base = 'Win32GUI'
 
 executables = [
 	Executable(
-		script='atxmonc.py',
+		script='atxmonc',
 		#appendScriptToExe=True,
 		#appendScriptToLibrary=False,
 		#compress=True,
