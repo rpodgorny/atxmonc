@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+__version__ = '0.0'
+
 import time
 import requests
 import subprocess
@@ -11,6 +13,7 @@ from utils import *
 import jinja2
 import threading
 import random
+import logging
 
 
 SERVER_URL = 'http://atxmon.asterix.cz:5000/save'
@@ -53,6 +56,10 @@ def probe_alive():
 
 
 def probe_load():
+	if not sys.platform.startswith('linux'):
+		return None
+	#endif
+
 	ret = {}
 
 	with open('/proc/loadavg', 'r') as f:
@@ -175,6 +182,8 @@ PROBE_MAP = {
 
 
 def main():
+	logging.basicConfig(level='DEBUG')
+
 	data = []
 	last_sent = 0
 
@@ -235,6 +244,7 @@ def main():
 		#endfor
 
 		if data and t > last_sent + SEND_INTERVAL:
+			logging.debug('sending %d records' % len(data))
 			try:
 				send(SERVER_URL, data)
 				data = []
