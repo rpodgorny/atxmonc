@@ -33,7 +33,7 @@ def main():
 	log_level = args['--log-level']
 
 	if sys.platform == 'win32':
-		log_fn = 'faddnsc.log'
+		log_fn = 'atxmonc.log'
 	else:
 		log_fn = None
 	#endif
