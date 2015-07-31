@@ -47,7 +47,7 @@ def main():
 
 	cfg_fn = args['-c']
 	if not cfg_fn:
-		for fn in (os.path.expanduser('~/.atxmonc.conf'), 'atxmonc.ini', '/etc/atxmonc.conf'):
+		for fn in (os.path.expanduser('~/.atxmonc/atxmonc.conf'), 'atxmonc.ini', '/etc/atxmonc/atxmonc.conf'):
 			if not os.path.isfile(fn): continue
 			cfg_fn = fn
 			break
@@ -66,6 +66,25 @@ def main():
 		logging.info('no configuration file specified nor found')
 	#endif
 
+	probes_fn = None
+	if not probes_fn:
+		for fn in (os.path.expanduser('~/.atxmonc/probes.conf'), 'probes.conf', '/etc/atxmonc/probes.conf'):
+			if not os.path.isfile(fn): continue
+			probes_fn = fn
+			break
+		#endfor
+	#endif
+
+	if probes_fn and not os.path.isfile(probes_fn):
+		logging.critical('%s does not exist, exitting' % probes_fn)
+		return
+	#endif
+
+	if not probes_fn:
+		logging.critical('no configuration file specified nor found')
+		return
+	#endif
+
 	if args['--host']: cfg.host = args['--host']
 	#if args['--interval']: cfg.interval = float(args['--interval'])
 	if args['--url']: cfg.url = args['--url']
@@ -79,7 +98,7 @@ def main():
 	logging.info('%s' % cfg)
 
 	try:
-		atxmon.run(cfg.url)
+		atxmon.run(cfg.url, probes_fn)
 	except KeyboardInterrupt:
 		logging.debug('keyboard interrupt!')
 	#endtry
