@@ -163,7 +163,7 @@ def probe_url_contains(url, contains=None):
 
 
 def send(url, data):
-	requests.post(url, data=json.dumps(data))
+	requests.post(url, data=json.dumps(data), timeout=10)  # TODO: hard-coded shit (what's the default, anyway?)
 #enddef
 
 
