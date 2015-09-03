@@ -11,6 +11,7 @@ Options:
   --log-level DEBUG | INFO | WARNING | ERROR
                   Debug level [default: INFO].
   -c <config_fn>  Config file path.
+  -s <state_fn>   State file path.
   --host=<host>   Hostname to report.
   -u, --url=<url>
                   URL of AtxMon server.
@@ -26,6 +27,11 @@ from atxmon.cfg import cfg
 
 import logging
 sys.excepthook = lambda t, v, tb: logging.critical('unhandled exception', exc_info=(t, v, tb))
+
+
+def load_state(fn):
+
+#enddef
 
 def main():
 	args = docopt.docopt(__doc__, version=__version__)
@@ -65,6 +71,18 @@ def main():
 	else:
 		logging.info('no configuration file specified nor found')
 	#endif
+
+	state_fn = 'state.json'
+	'''
+	state_fn = args['-s']
+	if not state_fn:
+		for fn in (os.path.expanduser('~/.atxmonc/state.json'), 'state.json', '/var/lib/atxmonc/state.json'):
+			if not os.path.isfile(fn): continue
+			state_fn = fn
+			break
+		#endfor
+	#endif
+	'''
 
 	probes_fn = None
 	if not probes_fn:
