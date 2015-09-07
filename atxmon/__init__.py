@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 import subprocess
@@ -9,6 +10,7 @@ import jinja2
 import threading
 import random
 import logging
+import json
 
 
 SEND_INTERVAL = 20
@@ -211,11 +213,34 @@ def expand_host(s):
 	return ret
 #enddef
 
-def run(url, probes_fn):
+
+def load_state(fn):
+	with open(fn, 'r') as f:
+		return json.load(f)
+	#endwith
+#enddef
+
+
+def save_state(state, fn):
+	with open(fn, 'w') as f:
+		json.dump(state, f, indent=2)
+	#endwith
+#enddef
+
+
+def run(url, probes_fn, state_fn):
 	url = '%s/save' % url  # TODO: not very nice
 
-	data = []
-	last_sent = 0
+	if os.path.isfile(state_fn):
+		logging.debug('loading state from %s' % state_fn)
+		state = load_state(state_fn)
+	else:
+		logging.debug('starting with empty state')
+		state = {}
+	#endif
+
+	data = state.get('data', [])
+	last_sent = state.get('last_sent', 0)
 
 	src = socket.gethostname()
 	probes = load_probes(probes_fn)
@@ -282,6 +307,11 @@ def run(url, probes_fn):
 			except Exception as e:
 				print('failed to send data: %s -> %s' % (str(e), len(data)))
 			#endtry
+
+			state['data'] = data
+			state['last_sent'] = last_sent
+			logging.debug('saving state to %s' % state_fn)
+			save_state(state, state_fn)
 		#endif
 
 		time.sleep(1)  # TODO: hard-coded shit

@@ -9,7 +9,7 @@ Usage:
 Options:
   -h, --help      Help.
   --log-level DEBUG | INFO | WARNING | ERROR
-                  Debug level [default: INFO].
+                  Debug level [default: DEBUG].
   -c <config_fn>  Config file path.
   -s <state_fn>   State file path.
   --host=<host>   Hostname to report.
@@ -28,10 +28,6 @@ from atxmon.cfg import cfg
 import logging
 sys.excepthook = lambda t, v, tb: logging.critical('unhandled exception', exc_info=(t, v, tb))
 
-
-def load_state(fn):
-
-#enddef
 
 def main():
 	args = docopt.docopt(__doc__, version=__version__)
@@ -116,7 +112,7 @@ def main():
 	logging.info('%s' % cfg)
 
 	try:
-		atxmon.run(cfg.url, probes_fn)
+		atxmon.run(cfg.url, probes_fn, state_fn)
 	except KeyboardInterrupt:
 		logging.debug('keyboard interrupt!')
 	#endtry
