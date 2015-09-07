@@ -238,6 +238,7 @@ def run(url, probes_fn, host, state_fn):
 
 	data = state.get('data', [])
 	last_sent = state.get('last_sent', 0)
+	data_last = None
 
 	src = host
 	probes = load_probes(probes_fn)
@@ -295,7 +296,8 @@ def run(url, probes_fn, host, state_fn):
 			last_run[probe_name] = t
 		#endfor
 
-		if data and t > last_sent + SEND_INTERVAL:
+		if data != data_last \
+		or (data and t > last_sent + SEND_INTERVAL):
 			logging.debug('sending %d records' % len(data))
 			try:
 				send(url, data)
@@ -304,12 +306,16 @@ def run(url, probes_fn, host, state_fn):
 			except Exception as e:
 				print('failed to send data: %s -> %s' % (str(e), len(data)))
 			#endtry
+		#endif
 
+		if data != data_last:
 			state['data'] = data
 			state['last_sent'] = last_sent
 			logging.debug('saving state to %s' % state_fn)
 			save_state(state, state_fn)
 		#endif
+
+		data_last = data.copy()
 
 		time.sleep(1)  # TODO: hard-coded shit
 	#endwhile
