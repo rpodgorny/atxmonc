@@ -9,8 +9,9 @@ Usage:
 Options:
   -h, --help      Help.
   --log-level DEBUG | INFO | WARNING | ERROR
-                  Debug level [default: INFO].
+                  Debug level [default: DEBUG].
   -c <config_fn>  Config file path.
+  -s <state_fn>   State file path.
   --host=<host>   Hostname to report.
   -u, --url=<url>
                   URL of AtxMon server.
@@ -26,6 +27,7 @@ from atxmon.cfg import cfg
 
 import logging
 sys.excepthook = lambda t, v, tb: logging.critical('unhandled exception', exc_info=(t, v, tb))
+
 
 def main():
 	args = docopt.docopt(__doc__, version=__version__)
@@ -66,6 +68,18 @@ def main():
 		logging.info('no configuration file specified nor found')
 	#endif
 
+	state_fn = 'state.json'
+	'''
+	state_fn = args['-s']
+	if not state_fn:
+		for fn in (os.path.expanduser('~/.atxmonc/state.json'), 'state.json', '/var/lib/atxmonc/state.json'):
+			if not os.path.isfile(fn): continue
+			state_fn = fn
+			break
+		#endfor
+	#endif
+	'''
+
 	probes_fn = None
 	if not probes_fn:
 		for fn in (os.path.expanduser('~/.atxmonc/probes.conf'), 'probes.conf', '/etc/atxmonc/probes.conf'):
@@ -98,7 +112,7 @@ def main():
 	logging.info('%s' % cfg)
 
 	try:
-		atxmon.run(cfg.url, probes_fn, cfg.host)
+		atxmon.run(cfg.url, probes_fn, cfg.host, state_fn)
 	except KeyboardInterrupt:
 		logging.debug('keyboard interrupt!')
 	#endtry

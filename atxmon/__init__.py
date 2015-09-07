@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 import subprocess
@@ -7,6 +8,7 @@ import jinja2
 import threading
 import random
 import logging
+import json
 
 
 SEND_INTERVAL = 20
@@ -161,7 +163,7 @@ def probe_url_contains(url, contains=None):
 
 
 def send(url, data):
-	requests.post(url, data=json.dumps(data))
+	requests.post(url, data=json.dumps(data), timeout=10)  # TODO: hard-coded shit (what's the default, anyway?)
 #enddef
 
 
@@ -209,11 +211,33 @@ def expand_host(s):
 	return ret
 #enddef
 
-def run(url, probes_fn, host):
+def load_state(fn):
+	with open(fn, 'r') as f:
+		return json.load(f)
+	#endwith
+#enddef
+
+
+def save_state(state, fn):
+	with open(fn, 'w') as f:
+		json.dump(state, f, indent=2)
+	#endwith
+#enddef
+
+
+def run(url, probes_fn, host, state_fn):
 	url = '%s/save' % url  # TODO: not very nice
 
-	data = []
-	last_sent = 0
+	if os.path.isfile(state_fn):
+		logging.debug('loading state from %s' % state_fn)
+		state = load_state(state_fn)
+	else:
+		logging.debug('starting with empty state')
+		state = {}
+	#endif
+
+	data = state.get('data', [])
+	last_sent = state.get('last_sent', 0)
 
 	src = host
 	probes = load_probes(probes_fn)
@@ -280,6 +304,11 @@ def run(url, probes_fn, host):
 			except Exception as e:
 				print('failed to send data: %s -> %s' % (str(e), len(data)))
 			#endtry
+
+			state['data'] = data
+			state['last_sent'] = last_sent
+			logging.debug('saving state to %s' % state_fn)
+			save_state(state, state_fn)
 		#endif
 
 		time.sleep(1)  # TODO: hard-coded shit
