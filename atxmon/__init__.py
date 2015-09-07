@@ -11,7 +11,7 @@ import logging
 import json
 
 
-SEND_INTERVAL = 20
+SEND_INTERVAL = 10
 THREADS_MAX = 10
 
 
@@ -301,11 +301,13 @@ def run(url, probes_fn, host, state_fn):
 			logging.debug('sending %d records' % len(data))
 			try:
 				send(url, data)
+				#last_sent = t
 				data = []
-				last_sent = t
 			except Exception as e:
 				print('failed to send data: %s -> %s' % (str(e), len(data)))
 			#endtry
+
+			last_sent = t
 		#endif
 
 		if data != data_last:
