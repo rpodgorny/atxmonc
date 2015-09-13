@@ -9,6 +9,7 @@ import threading
 import random
 import logging
 import json
+import sys
 
 
 SEND_INTERVAL = 10
