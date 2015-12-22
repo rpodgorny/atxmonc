@@ -231,7 +231,13 @@ def run(url, probes_fn, host, state_fn):
 
 	if os.path.isfile(state_fn):
 		logging.debug('loading state from %s' % state_fn)
-		state = load_state(state_fn)
+
+		try:
+			state = load_state(state_fn)
+		except:
+			logging.exception('failed to load state')
+			state = {}
+		#endtry
 	else:
 		logging.debug('starting with empty state')
 		state = {}
