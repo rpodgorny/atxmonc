@@ -32,8 +32,6 @@ def logging_setup(level, fn=None):
 		fh.setLevel(level)
 		fh.setFormatter(formatter)
 		logger.addHandler(fh)
-	#endif
-#enddef
 
 def load_probes(fn):
 	ret = []
@@ -41,7 +39,6 @@ def load_probes(fn):
 	with open(fn, 'r') as f:
 		t = jinja2.Template(f.read())
 		rendered = t.render()
-	#endwith
 
 	for line in rendered.splitlines():
 		line = line.strip()
@@ -54,24 +51,19 @@ def load_probes(fn):
 			interval = float(interval[:-1]) * 60
 		else:
 			interval = float(interval)
-		#endif
 
 		ret.append((interval, probe, args))
-	#endfor
 
 	return ret
-#enddef
 
 
 def probe_alive():
 	return {'ok': 1}
-#enddef
 
 
 def probe_load():
 	if not sys.platform.startswith('linux'):
 		return None
-	#endif
 
 	ret = {}
 
@@ -80,10 +72,8 @@ def probe_load():
 		ret['1min'] = loads[0]
 		ret['5min'] = loads[1]
 		ret['15min'] = loads[2]
-	#endwith
 
 	return ret
-#enddef
 
 
 def probe_ping(host, ipv6=False):
@@ -91,13 +81,11 @@ def probe_ping(host, ipv6=False):
 		cmd = 'ping6 -c 5 -q %s 2>/dev/null' % host
 	else:
 		cmd = 'ping -c 5 -q %s 2>/dev/null' % host
-	#endif
 
 	try:
 		out = subprocess.check_output(cmd, shell=True).decode()
 	except:
 		return {'ok': 0}
-	#endtry
 
 	packet_loss = None
 	rtt_avg = None
@@ -106,22 +94,17 @@ def probe_ping(host, ipv6=False):
 			# TODO: compile this?
 			m = re.match('.+, (\d+)% packet loss,.+', line)
 			packet_loss = int(m.groups()[0])
-		#endif
 
 		if 'rtt min/avg/max/mdev' in line:
 			# TODO: compile this?
 			m = re.match('rtt min/avg/max/mdev = ([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+) ms', line)
 			_, rtt_avg, _, _ = [float(i) for i in m.groups()]
-		#endif
-	#endfor
 
 	return {'ok': 1, 'packet_loss': packet_loss, 'rtt_avg': rtt_avg}
-#enddef
 
 
 def probe_ping6(host):
 	return probe_ping(host, ipv6=True)
-#enddef
 
 
 def probe_iperf3(host):
@@ -133,7 +116,6 @@ def probe_iperf3(host):
 			cmd = 'timeout 20 iperf3 -c %s -J -R -P 5' % host
 		else:
 			cmd = 'timeout 20 iperf3 -c %s -J -P 5' % host
-		#endif
 
 		try:
 			out = subprocess.check_output(cmd, shell=True).decode()
@@ -142,12 +124,9 @@ def probe_iperf3(host):
 			ret['%s/bits_per_second' % direction] = bits_per_second
 		except:
 			ok = 0
-		#endtry
-	#endfor
 
 	ret['ok'] = ok
 	return ret
-#enddef
 
 
 def probe_url_contains(url, contains=None):
@@ -157,15 +136,12 @@ def probe_url_contains(url, contains=None):
 		ok = 1
 	else:
 		ok = 0
-	#endif
 
 	return {'ok': ok}
-#enddef
 
 
 def send(url, data):
 	requests.post(url, data=json.dumps(data), timeout=10)  # TODO: hard-coded shit (what's the default, anyway?)
-#enddef
 
 
 class ProbeThread(threading.Thread):
@@ -176,12 +152,9 @@ class ProbeThread(threading.Thread):
 		self.fn = fn
 		self.args = args
 		self.res = None
-	#enddef
 
 	def run(self):
 		self.res = self.fn(*self.args)
-	#enddef
-#endclass
 
 
 PROBE_MAP = {
@@ -207,23 +180,17 @@ def expand_host(s):
 	ret = []
 	for i in range(from_, to_ + 1):
 		ret.append('%s%s%s' % (pre, i, post))
-	#endfor
 
 	return ret
-#enddef
 
 def load_state(fn):
 	with open(fn, 'r') as f:
 		return json.load(f)
-	#endwith
-#enddef
 
 
 def save_state(state, fn):
 	with open(fn, 'w') as f:
 		json.dump(state, f, indent=2)
-	#endwith
-#enddef
 
 
 def run(url, probes_fn, host, state_fn):
@@ -237,11 +204,9 @@ def run(url, probes_fn, host, state_fn):
 		except:
 			logging.exception('failed to load state')
 			state = {}
-		#endtry
 	else:
 		logging.debug('starting with empty state')
 		state = {}
-	#endif
 
 	data = state.get('data', [])
 	last_sent = state.get('last_sent', 0)
@@ -258,10 +223,8 @@ def run(url, probes_fn, host, state_fn):
 		probe_name = '%s/%s' % (src, probe)
 		if args:
 			probe_name = '%s/%s' % (probe_name, '/'.join(args))
-		#endif
 
 		last_run[probe_name] = time.time() - interval * random.random()
-	#endfor
 
 	while 1:
 		t = time.time()
@@ -277,19 +240,15 @@ def run(url, probes_fn, host, state_fn):
 					k_full = '%s/%s' % (probe_name, res_name)
 					data.append({'path': k_full, 'value': v, 'time': t, 'interval': interval})
 					logging.debug('got %s=%s' % (k_full, v))
-				#endfor
-			#endif
 
 			thr.join()
 			del threads[probe_name]
-		#endfor
 
 		for interval, probe, args in probes:
 			# TODO: cut-n-pasted from above
 			probe_name = '%s/%s' % (src, probe)
 			if args:
 				probe_name = '%s/%s' % (probe_name, '/'.join(args))
-			#endif
 
 			if t < last_run[probe_name] + interval: continue
 			if len(threads) >= THREADS_MAX: break
@@ -301,7 +260,6 @@ def run(url, probes_fn, host, state_fn):
 			thr.start()
 			threads[probe_name] = thr
 			last_run[probe_name] = t
-		#endfor
 
 		if data != data_last \
 		or (data and t > last_sent + SEND_INTERVAL):
@@ -312,20 +270,15 @@ def run(url, probes_fn, host, state_fn):
 				data = []
 			except Exception as e:
 				print('failed to send data: %s -> %s' % (str(e), len(data)))
-			#endtry
 
 			last_sent = t
-		#endif
 
 		if data != data_last:
 			state['data'] = data
 			state['last_sent'] = last_sent
 			logging.debug('saving state to %s' % state_fn)
 			save_state(state, state_fn)
-		#endif
 
 		data_last = data.copy()
 
 		time.sleep(1)  # TODO: hard-coded shit
-	#endwhile
-#enddef
