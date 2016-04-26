@@ -8,7 +8,6 @@ import jinja2
 import threading
 import random
 import logging
-import json
 import sys
 
 
@@ -34,6 +33,7 @@ def logging_setup(level, fn=None):
 		fh.setFormatter(formatter)
 		logger.addHandler(fh)
 
+
 def load_probes(fn):
 	ret = []
 
@@ -44,8 +44,10 @@ def load_probes(fn):
 	for line in rendered.splitlines():
 		line = line.strip()
 
-		if not line: continue
-		if line.startswith('#'): continue
+		if not line:
+			continue
+		if line.startswith('#'):
+			continue
 
 		interval, probe, *args = line.split(';')
 		if interval.endswith('m'):
@@ -234,7 +236,8 @@ def run(url, probes_fn, host, state_fn):
 		t = time.time()
 
 		for probe_name, thr in threads.copy().items():
-			if thr.is_alive(): continue
+			if thr.is_alive():
+				continue
 
 			res = thr.res
 			interval = thr.interval
@@ -254,8 +257,10 @@ def run(url, probes_fn, host, state_fn):
 			if args:
 				probe_name = '%s/%s' % (probe_name, '/'.join(args))
 
-			if t < last_run[probe_name] + interval: continue
-			if len(threads) >= THREADS_MAX: break
+			if t < last_run[probe_name] + interval:
+				continue
+			if len(threads) >= THREADS_MAX:
+				break
 
 			logging.debug('starting %s (%s/%s)' % (probe_name, len(threads) + 1, THREADS_MAX))
 
