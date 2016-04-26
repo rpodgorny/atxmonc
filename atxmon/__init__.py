@@ -13,6 +13,7 @@ import sys
 
 
 SEND_INTERVAL = 10
+SEND_ITEMS_LIMIT = 100
 THREADS_MAX = 10
 
 
@@ -263,13 +264,14 @@ def run(url, probes_fn, host, state_fn):
 
 		if data != data_last \
 		or (data and t > last_sent + SEND_INTERVAL):
-			logging.debug('sending %d records' % len(data))
+			logging.debug('total %d records' % len(data))
+			logging.debug('sending %d records' % len(data[:SEND_ITEMS_LIMIT]))
 			try:
-				send(url, data)
+				send(url, data[:SEND_ITEMS_LIMIT])
 				#last_sent = t
-				data = []
+				data = data[SEND_ITEMS_LIMIT:]
 			except Exception as e:
-				print('failed to send data: %s -> %s' % (str(e), len(data)))
+				print('failed to send data: %s -> %s' % (str(e), len(data[:SEND_ITEMS_LIMIT])))
 
 			last_sent = t
 
