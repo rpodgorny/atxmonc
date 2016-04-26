@@ -167,8 +167,10 @@ PROBE_MAP = {
 	'iperf3': probe_iperf3,
 }
 
+
 def expand_host(s):
-	if not '[' in s or not '-' in s or not ']' in s: return [s, ]
+	if '[' not in s or '-' not in s or ']' not in s:
+		return [s, ]
 
 	pre = s.split('[')[0]
 	post = s.split(']')[1]
@@ -183,6 +185,7 @@ def expand_host(s):
 		ret.append('%s%s%s' % (pre, i, post))
 
 	return ret
+
 
 def load_state(fn):
 	with open(fn, 'r') as f:
