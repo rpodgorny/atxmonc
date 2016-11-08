@@ -38,7 +38,6 @@ def main():
 		log_fn = 'atxmonc.log'
 	else:
 		log_fn = None
-	#endif
 
 	atxmon.logging_setup(log_level, log_fn)
 
@@ -53,20 +52,16 @@ def main():
 			if not os.path.isfile(fn): continue
 			cfg_fn = fn
 			break
-		#endfor
-	#endif
 
 	if cfg_fn and not os.path.isfile(cfg_fn):
 		logging.critical('%s does not exist, exiting' % cfg_fn)
 		return
-	#endif
 
 	if cfg_fn:
 		logging.info('reading configuration from %s' % cfg_fn)
 		cfg.read_from_ini(cfg_fn)
 	else:
 		logging.info('no configuration file specified nor found')
-	#endif
 
 	state_fn = 'state.json'
 	'''
@@ -76,8 +71,6 @@ def main():
 			if not os.path.isfile(fn): continue
 			state_fn = fn
 			break
-		#endfor
-	#endif
 	'''
 
 	probes_fn = None
@@ -86,18 +79,14 @@ def main():
 			if not os.path.isfile(fn): continue
 			probes_fn = fn
 			break
-		#endfor
-	#endif
 
 	if probes_fn and not os.path.isfile(probes_fn):
 		logging.critical('%s does not exist, exiting' % probes_fn)
 		return
-	#endif
 
 	if not probes_fn:
 		logging.critical('no configuration file specified nor found')
 		return
-	#endif
 
 	if args['--host']: cfg.host = args['--host']
 	#if args['--interval']: cfg.interval = float(args['--interval'])
@@ -107,7 +96,6 @@ def main():
 	if err:
 		logging.critical(err)
 		return
-	#endif
 
 	logging.info('%s' % cfg)
 
@@ -115,12 +103,9 @@ def main():
 		atxmon.run(cfg.url, probes_fn, cfg.host, state_fn)
 	except KeyboardInterrupt:
 		logging.debug('keyboard interrupt!')
-	#endtry
 
 	logging.info('exit')
-#enddef
 
 
 if __name__ == '__main__':
 	main()
-#endif
