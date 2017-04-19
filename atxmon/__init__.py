@@ -36,27 +36,21 @@ def logging_setup(level, fn=None):
 
 def load_probes(fn):
 	ret = []
-
 	with open(fn, 'r') as f:
 		t = jinja2.Template(f.read())
 		rendered = t.render()
-
 	for line in rendered.splitlines():
 		line = line.strip()
-
 		if not line:
 			continue
 		if line.startswith('#'):
 			continue
-
 		interval, probe, *args = line.split(';')
 		if interval.endswith('m'):
 			interval = float(interval[:-1]) * 60
 		else:
 			interval = float(interval)
-
 		ret.append((interval, probe, args))
-
 	return ret
 
 
@@ -67,15 +61,12 @@ def probe_alive():
 def probe_load():
 	if not sys.platform.startswith('linux'):
 		return None
-
 	ret = {}
-
 	with open('/proc/loadavg', 'r') as f:
 		loads = [float(i) for i in f.read().split()[:3]]
 		ret['1min'] = loads[0]
 		ret['5min'] = loads[1]
 		ret['15min'] = loads[2]
-
 	return ret
 
 

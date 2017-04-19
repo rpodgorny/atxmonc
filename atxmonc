@@ -9,7 +9,7 @@ Usage:
 Options:
   -h, --help      Help.
   --log-level DEBUG | INFO | WARNING | ERROR
-                  Debug level [default: DEBUG].
+                  Debug level [default: INFO].
   -c <config_fn>  Config file path.
   -s <state_fn>   State file path.
   --host=<host>   Hostname to report.
@@ -31,20 +31,12 @@ sys.excepthook = lambda t, v, tb: logging.critical('unhandled exception', exc_in
 
 def main():
 	args = docopt.docopt(__doc__, version=__version__)
-
 	log_level = args['--log-level']
-
-	if sys.platform == 'win32':
-		log_fn = 'atxmonc.log'
-	else:
-		log_fn = None
-
+	log_fn = 'atxmonc.log' if sys.platform == 'win32' else None
 	atxmon.logging_setup(log_level, log_fn)
-
 	logging.info('*' * 40)
 	logging.info('starting atxmonc v%s' % __version__)
-
-	logging.debug(str(args))
+	logging.debug('args: %s' % dict(args))
 
 	cfg_fn = args['-c']
 	if not cfg_fn:
@@ -88,16 +80,19 @@ def main():
 		logging.critical('no configuration file specified nor found')
 		return
 
-	if args['--host']: cfg.host = args['--host']
-	#if args['--interval']: cfg.interval = float(args['--interval'])
-	if args['--url']: cfg.url = args['--url']
+	if args['--host']:
+		cfg.host = args['--host']
+	#if args['--interval']:
+	#	cfg.interval = float(args['--interval'])
+	if args['--url']:
+		cfg.url = args['--url']
 
 	err = cfg.check()
 	if err:
 		logging.critical(err)
 		return
 
-	logging.info('%s' % cfg)
+	logging.info('cfg: %s' % cfg)
 
 	try:
 		atxmon.run(cfg.url, probes_fn, cfg.host, state_fn)
