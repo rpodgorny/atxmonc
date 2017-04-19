@@ -41,7 +41,8 @@ def main():
 	cfg_fn = args['-c']
 	if not cfg_fn:
 		for fn in (os.path.expanduser('~/.atxmonc/atxmonc.conf'), 'atxmonc.ini', '/etc/atxmonc/atxmonc.conf'):
-			if not os.path.isfile(fn): continue
+			if not os.path.isfile(fn):
+				continue
 			cfg_fn = fn
 			break
 
@@ -68,7 +69,8 @@ def main():
 	probes_fn = None
 	if not probes_fn:
 		for fn in (os.path.expanduser('~/.atxmonc/probes.conf'), 'probes.conf', '/etc/atxmonc/probes.conf'):
-			if not os.path.isfile(fn): continue
+			if not os.path.isfile(fn):
+				continue
 			probes_fn = fn
 			break
 
