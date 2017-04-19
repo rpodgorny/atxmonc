@@ -31,6 +31,7 @@ setup(
 			#'create_shared_zip': False,
 			#'compressed': True,
 			'include_msvcr': True,
+			'packages': ['asyncio', ],
 		},
 	},
 	executables = executables,
