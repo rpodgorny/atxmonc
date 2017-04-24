@@ -40,7 +40,7 @@ def main():
 
 	cfg_fn = args['-c']
 	if not cfg_fn:
-		for fn in (os.path.expanduser('~/.atxmonc/atxmonc.conf'), 'atxmonc.ini', '/etc/atxmonc/atxmonc.conf'):
+		for fn in (os.path.expanduser('~/.atxmonc/atxmonc.conf'), 'atxmonc.conf', '/etc/atxmonc/atxmonc.conf', 'atxmonc.ini'):
 			if not os.path.isfile(fn):
 				continue
 			cfg_fn = fn
